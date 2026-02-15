@@ -8,16 +8,16 @@ export interface AuthRequest extends Request {
 export function requireAuth(
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const header = req.headers.authorization;
 
-  if (!header || !header.startsWith("Bearer ")) {
+  if (!header) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    const token = header.split(" ")[1];
+    const token = header;
     const payload = verifyToken(token);
     req.userId = payload.userId;
     next();
