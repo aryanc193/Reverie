@@ -1,4 +1,5 @@
 import { IMemory, Memory } from "../memory/memory.model";
+import { env } from "../config/env";
 import { AppError } from "../utils/api-error";
 import {
   CreateMemoryInput,
@@ -28,6 +29,43 @@ function buildListFilter(
   return filter;
 }
 
+function markMemoryForReprocessing(memory: IMemory) {
+  memory.reflection = undefined;
+  memory.embeddingId = undefined;
+  memory.processingStatus = "pending";
+  memory.processingAttempts = 0;
+  memory.lastProcessingError = undefined;
+}
+
+export function buildMemoryAnalysisText(memory: IMemory): string {
+  const parts = [memory.title, memory.richTextContent].filter(Boolean);
+  return parts.join("\n\n");
+}
+
+export function buildPendingMemoryQuery() {
+  const staleBefore = new Date(Date.now() - env.reflectionStaleProcessingMs);
+
+  return {
+    $or: [
+      {
+        processingStatus: "pending",
+      },
+      {
+        processingStatus: "failed",
+        processingAttempts: { $lt: env.reflectionMaxAttempts },
+      },
+      {
+        processingStatus: { $exists: false },
+        "reflection.processedAt": { $exists: false },
+      },
+      {
+        processingStatus: "processing",
+        updatedAt: { $lt: staleBefore },
+      },
+    ],
+  };
+}
+
 export async function createMemory(userId: string, input: CreateMemoryInput) {
   return Memory.create({
     userId,
@@ -38,6 +76,8 @@ export async function createMemory(userId: string, input: CreateMemoryInput) {
     customDateTime: input.customDateTime,
     location: input.location,
     important: input.important,
+    processingStatus: "pending",
+    processingAttempts: 0,
   });
 }
 
@@ -120,8 +160,7 @@ export async function updateMemory(
   }
 
   if (contentChanged) {
-    memory.reflection = undefined;
-    memory.embeddingId = undefined;
+    markMemoryForReprocessing(memory);
   }
 
   await memory.save();
@@ -141,13 +180,22 @@ export async function deleteMemory(userId: string, memoryId: string) {
   return { success: true as const };
 }
 
-export async function findUnprocessedMemories(limit = 10) {
-  return Memory.find({
-    $or: [
-      { reflection: { $exists: false } },
-      { "reflection.processedAt": { $exists: false } },
-    ],
-  })
-    .sort({ createdAt: 1 })
-    .limit(limit);
+export async function claimPendingMemory() {
+  return Memory.findOneAndUpdate(
+    buildPendingMemoryQuery(),
+    {
+      $set: {
+        processingStatus: "processing",
+        lastProcessingError: undefined,
+      },
+    },
+    {
+      sort: { createdAt: 1 },
+      new: true,
+    },
+  );
+}
+
+export async function countPendingMemories() {
+  return Memory.countDocuments(buildPendingMemoryQuery());
 }

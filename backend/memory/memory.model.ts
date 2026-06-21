@@ -2,6 +2,8 @@ import { Schema, model, Document, Types } from "mongoose";
 
 export type MemoryMood = "great" | "good" | "neutral" | "low" | "bad";
 
+export type ProcessingStatus = "pending" | "processing" | "done" | "failed";
+
 export interface IMemory extends Document {
   userId: Types.ObjectId;
 
@@ -22,6 +24,10 @@ export interface IMemory extends Document {
   };
 
   important: boolean;
+
+  processingStatus: ProcessingStatus;
+  processingAttempts: number;
+  lastProcessingError?: string;
 
   reflection?: {
     summary?: string;
@@ -77,6 +83,22 @@ const MemorySchema = new Schema<IMemory>(
       index: true,
     },
 
+    processingStatus: {
+      type: String,
+      enum: ["pending", "processing", "done", "failed"],
+      default: "pending",
+      index: true,
+    },
+
+    processingAttempts: {
+      type: Number,
+      default: 0,
+    },
+
+    lastProcessingError: {
+      type: String,
+    },
+
     reflection: {
       summary: String,
       emotions: [String],
@@ -95,6 +117,7 @@ const MemorySchema = new Schema<IMemory>(
 
 MemorySchema.index({ userId: 1, createdAt: -1 });
 MemorySchema.index({ userId: 1, tags: 1 });
+MemorySchema.index({ processingStatus: 1, createdAt: 1 });
 MemorySchema.index({ title: "text", richTextContent: "text" });
 
 export const Memory = model<IMemory>("Memory", MemorySchema);

@@ -4,7 +4,14 @@ export interface ReflectionAnalysis {
   themes: string[];
 }
 
+export interface MemoryAnalysisInput {
+  title?: string;
+  richTextContent: string;
+  mood?: string;
+  tags?: string[];
+}
+
 export interface AiService {
-  analyzeEntry(content: string): Promise<ReflectionAnalysis>;
+  analyzeEntry(input: MemoryAnalysisInput): Promise<ReflectionAnalysis>;
   embed(text: string): Promise<string>;
 }
