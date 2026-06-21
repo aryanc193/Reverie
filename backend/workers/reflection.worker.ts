@@ -1,12 +1,7 @@
-import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { env } from "../config/env";
-import {
-  processPendingMemories,
-} from "../services/reflection.service";
+import { processPendingMemories } from "../services/reflection.service";
 import { countPendingMemories } from "../services/memory.service";
-
-dotenv.config();
 
 let consecutiveErrors = 0;
 
@@ -34,7 +29,9 @@ async function poll() {
     }
 
     if (failed.length > 0) {
-      console.warn(`Failed to process ${failed.length} memories: ${failed.join(", ")}`);
+      console.warn(
+        `Failed to process ${failed.length} memories: ${failed.join(", ")}`,
+      );
     }
 
     consecutiveErrors = 0;

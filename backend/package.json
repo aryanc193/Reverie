@@ -8,7 +8,7 @@
     "dev": "ts-node-dev -r dotenv/config --respawn index.ts",
     "build": "tsc",
     "start": "node -r dotenv/config dist/index.js",
-    "worker": "ts-node-dev workers/reflection.worker.ts"
+    "worker": "ts-node-dev -r dotenv/config workers/reflection.worker.ts"
   },
   "keywords": [],
   "author": "",

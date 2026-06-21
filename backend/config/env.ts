@@ -1,3 +1,27 @@
+import { existsSync } from "fs";
+import path from "path";
+import dotenv from "dotenv";
+
+function loadEnvFile() {
+  const candidates = [
+    path.resolve(process.cwd(), ".env"),
+    path.resolve(__dirname, "../.env"),
+    path.resolve(__dirname, "../../.env"),
+  ];
+
+  for (const envPath of candidates) {
+    if (existsSync(envPath)) {
+      dotenv.config({ path: envPath });
+      return envPath;
+    }
+  }
+
+  dotenv.config();
+  return null;
+}
+
+loadEnvFile();
+
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value) {
