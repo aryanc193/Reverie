@@ -4,6 +4,7 @@ import { validate } from "../middleware/validate";
 import {
   createMemoryHandler,
   getMemories,
+  searchMemoriesHandler,
   getMemory,
   updateMemoryHandler,
   deleteMemoryHandler,
@@ -12,6 +13,7 @@ import {
   createMemorySchema,
   updateMemorySchema,
   listMemoriesSchema,
+  searchMemoriesSchema,
   memoryIdSchema,
 } from "../validators/memory.validator";
 
@@ -22,6 +24,12 @@ router.post(
   requireAuth,
   validate(createMemorySchema),
   createMemoryHandler,
+);
+router.get(
+  "/search",
+  requireAuth,
+  validate(searchMemoriesSchema, "query"),
+  searchMemoriesHandler,
 );
 router.get(
   "/",

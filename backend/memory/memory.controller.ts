@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/async-handler";
 import {
   createMemory,
   listMemories,
+  searchMemories,
   getMemoryById,
   updateMemory,
   deleteMemory,
@@ -11,6 +12,7 @@ import {
 import {
   CreateMemoryInput,
   ListMemoriesInput,
+  SearchMemoriesInput,
   UpdateMemoryInput,
 } from "../validators/memory.validator";
 
@@ -29,6 +31,16 @@ export const getMemories = asyncHandler(
     const memories = await listMemories(
       req.userId!,
       req.query as unknown as ListMemoriesInput,
+    );
+    res.json(memories);
+  },
+);
+
+export const searchMemoriesHandler = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const memories = await searchMemories(
+      req.userId!,
+      req.query as unknown as SearchMemoriesInput,
     );
     res.json(memories);
   },

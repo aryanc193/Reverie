@@ -1,15 +1,40 @@
-import { Memory } from "../memory/memory.model";
+import { IMemory, Memory } from "../memory/memory.model";
 import { AppError } from "../utils/api-error";
 import {
   CreateMemoryInput,
   ListMemoriesInput,
+  SearchMemoriesInput,
   UpdateMemoryInput,
 } from "../validators/memory.validator";
+
+function buildListFilter(
+  userId: string,
+  input: Pick<ListMemoriesInput, "mood" | "tags" | "important">,
+) {
+  const filter: Record<string, unknown> = { userId };
+
+  if (input.mood) {
+    filter.mood = input.mood;
+  }
+
+  if (input.tags && input.tags.length > 0) {
+    filter.tags = { $all: input.tags };
+  }
+
+  if (input.important !== undefined) {
+    filter.important = input.important;
+  }
+
+  return filter;
+}
 
 export async function createMemory(userId: string, input: CreateMemoryInput) {
   return Memory.create({
     userId,
+    title: input.title,
     richTextContent: input.richTextContent,
+    mood: input.mood,
+    tags: input.tags ?? [],
     customDateTime: input.customDateTime,
     location: input.location,
     important: input.important,
@@ -18,9 +43,25 @@ export async function createMemory(userId: string, input: CreateMemoryInput) {
 
 export async function listMemories(userId: string, input: ListMemoriesInput) {
   const skip = (input.page - 1) * input.limit;
+  const filter = buildListFilter(userId, input);
 
-  return Memory.find({ userId })
+  return Memory.find(filter)
     .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(input.limit);
+}
+
+export async function searchMemories(
+  userId: string,
+  input: SearchMemoriesInput,
+) {
+  const skip = (input.page - 1) * input.limit;
+
+  return Memory.find({
+    userId,
+    $text: { $search: input.query },
+  })
+    .sort({ score: { $meta: "textScore" }, createdAt: -1 })
     .skip(skip)
     .limit(input.limit);
 }
@@ -56,8 +97,17 @@ export async function updateMemory(
     input.richTextContent !== undefined &&
     input.richTextContent !== memory.richTextContent;
 
+  if (input.title !== undefined) {
+    memory.title = input.title ?? undefined;
+  }
   if (input.richTextContent !== undefined) {
     memory.richTextContent = input.richTextContent;
+  }
+  if (input.mood !== undefined) {
+    memory.mood = input.mood ?? undefined;
+  }
+  if (input.tags !== undefined) {
+    memory.tags = input.tags;
   }
   if (input.customDateTime !== undefined) {
     memory.customDateTime = input.customDateTime ?? undefined;

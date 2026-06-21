@@ -1,9 +1,14 @@
 import { Schema, model, Document, Types } from "mongoose";
 
+export type MemoryMood = "great" | "good" | "neutral" | "low" | "bad";
+
 export interface IMemory extends Document {
   userId: Types.ObjectId;
 
+  title?: string;
   richTextContent: string;
+  mood?: MemoryMood;
+  tags: string[];
 
   createdAt: Date;
   updatedAt: Date;
@@ -37,9 +42,25 @@ const MemorySchema = new Schema<IMemory>(
       index: true,
     },
 
+    title: {
+      type: String,
+      trim: true,
+    },
+
     richTextContent: {
       type: String,
       required: true,
+    },
+
+    mood: {
+      type: String,
+      enum: ["great", "good", "neutral", "low", "bad"],
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+      index: true,
     },
 
     customDateTime: Date,
@@ -69,9 +90,11 @@ const MemorySchema = new Schema<IMemory>(
       index: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 MemorySchema.index({ userId: 1, createdAt: -1 });
+MemorySchema.index({ userId: 1, tags: 1 });
+MemorySchema.index({ title: "text", richTextContent: "text" });
 
 export const Memory = model<IMemory>("Memory", MemorySchema);
