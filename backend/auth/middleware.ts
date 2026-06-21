@@ -1,27 +1,26 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { verifyToken } from "./jwt";
+import { AppError } from "../utils/api-error";
+import { AuthRequest } from "../types/express";
 
-export interface AuthRequest extends Request {
-  userId?: string;
-}
+export type { AuthRequest };
 
 export function requireAuth(
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) {
   const header = req.headers.authorization;
 
   if (!header) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return next(new AppError(401, "Unauthorized"));
   }
 
   try {
-    const token = header;
-    const payload = verifyToken(token);
+    const payload = verifyToken(header);
     req.userId = payload.userId;
     next();
   } catch {
-    return res.status(401).json({ error: "Invalid token" });
+    next(new AppError(401, "Invalid token"));
   }
 }

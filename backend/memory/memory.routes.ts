@@ -1,19 +1,52 @@
 import { Router } from "express";
 import { requireAuth } from "../auth/middleware";
+import { validate } from "../middleware/validate";
 import {
-  createMemory,
+  createMemoryHandler,
   getMemories,
   getMemory,
-  updateMemory,
-  deleteMemory,
+  updateMemoryHandler,
+  deleteMemoryHandler,
 } from "./memory.controller";
+import {
+  createMemorySchema,
+  updateMemorySchema,
+  listMemoriesSchema,
+  memoryIdSchema,
+} from "../validators/memory.validator";
 
 const router = Router();
 
-router.post("/create", requireAuth, createMemory);
-router.get("/", requireAuth, getMemories);
-router.get("/:id", requireAuth, getMemory);
-router.patch("/:id", requireAuth, updateMemory);
-router.delete("/:id", requireAuth, deleteMemory);
+router.post(
+  "/create",
+  requireAuth,
+  validate(createMemorySchema),
+  createMemoryHandler,
+);
+router.get(
+  "/",
+  requireAuth,
+  validate(listMemoriesSchema, "query"),
+  getMemories,
+);
+router.get(
+  "/:id",
+  requireAuth,
+  validate(memoryIdSchema, "params"),
+  getMemory,
+);
+router.patch(
+  "/:id",
+  requireAuth,
+  validate(memoryIdSchema, "params"),
+  validate(updateMemorySchema),
+  updateMemoryHandler,
+);
+router.delete(
+  "/:id",
+  requireAuth,
+  validate(memoryIdSchema, "params"),
+  deleteMemoryHandler,
+);
 
 export default router;
