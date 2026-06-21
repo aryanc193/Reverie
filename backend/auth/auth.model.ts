@@ -1,5 +1,13 @@
 import { Schema, model, Document } from "mongoose";
 
+export type UserRole = "user" | "admin";
+
+export interface IRefreshTokenEntry {
+  tokenHash: string;
+  expiresAt: Date;
+  createdAt: Date;
+}
+
 export interface IUser extends Document {
   email: string;
   username: string;
@@ -8,8 +16,21 @@ export interface IUser extends Document {
     contentType: string;
   };
   passwordHash: string;
+  role: UserRole;
+  isVerified: boolean;
+  refreshTokens: IRefreshTokenEntry[];
   createdAt: Date;
+  updatedAt: Date;
 }
+
+const RefreshTokenSchema = new Schema<IRefreshTokenEntry>(
+  {
+    tokenHash: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
+    createdAt: { type: Date, required: true, default: Date.now },
+  },
+  { _id: false },
+);
 
 const UserSchema = new Schema<IUser>(
   {
@@ -40,10 +61,23 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    refreshTokens: {
+      type: [RefreshTokenSchema],
+      default: [],
+    },
   },
   {
-    timestamps: { createdAt: true, updatedAt: false },
-  }
+    timestamps: true,
+  },
 );
 
 export const User = model<IUser>("User", UserSchema);

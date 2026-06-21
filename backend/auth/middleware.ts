@@ -1,7 +1,8 @@
 import { Response, NextFunction } from "express";
-import { verifyToken } from "./jwt";
+import { verifyAccessToken } from "./jwt";
 import { AppError } from "../utils/api-error";
 import { AuthRequest } from "../types/express";
+import { UserRole } from "./auth.model";
 
 export type { AuthRequest };
 
@@ -17,10 +18,25 @@ export function requireAuth(
   }
 
   try {
-    const payload = verifyToken(header);
+    const payload = verifyAccessToken(header);
     req.userId = payload.userId;
+    req.userRole = payload.role;
     next();
   } catch {
     next(new AppError(401, "Invalid token"));
   }
+}
+
+export function authorize(...roles: UserRole[]) {
+  return (req: AuthRequest, _res: Response, next: NextFunction) => {
+    if (!req.userRole) {
+      return next(new AppError(401, "Unauthorized"));
+    }
+
+    if (!roles.includes(req.userRole)) {
+      return next(new AppError(403, "Forbidden"));
+    }
+
+    next();
+  };
 }
