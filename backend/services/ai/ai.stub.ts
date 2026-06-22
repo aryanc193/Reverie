@@ -1,6 +1,8 @@
 import { createHash } from "crypto";
 import {
   AiService,
+  InsightGenerationInput,
+  InsightGenerationResult,
   MemoryAnalysisInput,
   ReflectionAnalysis,
 } from "./ai.interface";
@@ -56,6 +58,52 @@ export class StubAiService implements AiService {
 
   async embed(text: string): Promise<string> {
     return `stub-embed-${createHash("sha256").update(text).digest("hex").slice(0, 12)}`;
+  }
+
+  async generateInsight(
+    input: InsightGenerationInput,
+  ): Promise<InsightGenerationResult> {
+    const seed = createHash("sha256")
+      .update(
+        input.memories
+          .map((memory) => memory.id)
+          .sort()
+          .join(","),
+      )
+      .digest("hex")
+      .slice(0, 8);
+
+    const themes = [
+      ...new Set(
+        input.memories.flatMap((memory) => memory.themes ?? []),
+      ),
+    ].slice(0, 3);
+
+    const emotions = [
+      ...new Set(
+        input.memories.flatMap((memory) => memory.emotions ?? []),
+      ),
+    ].slice(0, 3);
+
+    const moods = [
+      ...new Set(
+        input.memories
+          .map((memory) => memory.mood)
+          .filter((mood): mood is string => Boolean(mood)),
+      ),
+    ];
+
+    const themeText =
+      themes.length > 0 ? themes.join(", ") : pickFrom(STUB_THEMES, seed, 2).join(", ");
+    const emotionText =
+      emotions.length > 0
+        ? emotions.join(", ")
+        : pickFrom(STUB_EMOTIONS, seed, 2).join(", ");
+
+    return {
+      title: `Weekly insight (${seed})`,
+      content: `Over the last ${input.lookbackDays} days, you wrote ${input.memories.length} entries. Recurring themes: ${themeText}. Emotional tone: ${emotionText}.${moods.length > 0 ? ` Moods logged: ${moods.join(", ")}.` : ""}`,
+    };
   }
 }
 
