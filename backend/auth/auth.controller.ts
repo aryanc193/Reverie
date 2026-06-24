@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { asyncHandler } from "../utils/async-handler";
 import {
   registerUser,
@@ -15,24 +15,24 @@ import {
   LogoutInput,
 } from "../validators/auth.validator";
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
-  const result = await registerUser(req.body as RegisterInput);
+export const register = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const result = await registerUser(req.validatedBody as RegisterInput);
   res.status(201).json(result);
 });
 
-export const login = asyncHandler(async (req: Request, res: Response) => {
-  const result = await loginUser(req.body as LoginInput);
+export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const result = await loginUser(req.validatedBody as LoginInput);
   res.json(result);
 });
 
-export const refresh = asyncHandler(async (req: Request, res: Response) => {
-  const { refreshToken } = req.body as RefreshInput;
+export const refresh = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { refreshToken } = req.validatedBody as RefreshInput;
   const result = await refreshTokens(refreshToken);
   res.json(result);
 });
 
-export const logout = asyncHandler(async (req: Request, res: Response) => {
-  const { refreshToken } = req.body as LogoutInput;
+export const logout = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { refreshToken } = req.validatedBody as LogoutInput;
   await logoutUser(refreshToken);
   res.json({ success: true });
 });

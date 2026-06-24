@@ -1,9 +1,11 @@
 import { IMemory, Memory } from "../memory/memory.model";
 import { env } from "../config/env";
 import { AppError } from "../utils/api-error";
+import { rankRelevantMemories } from "../utils/relevance";
 import {
   CreateMemoryInput,
   ListMemoriesInput,
+  RelevantMemoriesInput,
   SearchMemoriesInput,
   UpdateMemoryInput,
 } from "../validators/memory.validator";
@@ -104,6 +106,36 @@ export async function searchMemories(
     .sort({ score: { $meta: "textScore" }, createdAt: -1 })
     .skip(skip)
     .limit(input.limit);
+}
+
+export async function findRelevantMemories(
+  userId: string,
+  input: RelevantMemoriesInput,
+) {
+  const memories = await Memory.find({ userId }).sort({ createdAt: -1 });
+  const ranked = rankRelevantMemories(
+    memories,
+    input.query,
+    input.tags ?? [],
+  );
+
+  const skip = (input.page - 1) * input.limit;
+  const pageResults = ranked.slice(skip, skip + input.limit);
+
+  return {
+    query: input.query,
+    tags: input.tags ?? [],
+    page: input.page,
+    limit: input.limit,
+    total: ranked.length,
+    retrieval: "stub-text-tag-v1",
+    results: pageResults.map((result) => ({
+      score: result.score,
+      matchedTags: result.matchedTags,
+      matchReasons: result.matchReasons,
+      memory: result.memory,
+    })),
+  };
 }
 
 export async function getMemoryById(userId: string, memoryId: string) {

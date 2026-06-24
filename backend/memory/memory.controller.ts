@@ -5,6 +5,7 @@ import {
   createMemory,
   listMemories,
   searchMemories,
+  findRelevantMemories,
   getMemoryById,
   updateMemory,
   deleteMemory,
@@ -13,6 +14,7 @@ import {
   CreateMemoryInput,
   ListMemoriesInput,
   SearchMemoriesInput,
+  RelevantMemoriesInput,
   UpdateMemoryInput,
 } from "../validators/memory.validator";
 
@@ -20,7 +22,7 @@ export const createMemoryHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const memory = await createMemory(
       req.userId!,
-      req.body as CreateMemoryInput,
+      req.validatedBody as CreateMemoryInput,
     );
     res.status(201).json(memory);
   },
@@ -30,7 +32,7 @@ export const getMemories = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const memories = await listMemories(
       req.userId!,
-      req.query as unknown as ListMemoriesInput,
+      req.validatedQuery as ListMemoriesInput,
     );
     res.json(memories);
   },
@@ -40,25 +42,35 @@ export const searchMemoriesHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const memories = await searchMemories(
       req.userId!,
-      req.query as unknown as SearchMemoriesInput,
+      req.validatedQuery as SearchMemoriesInput,
     );
     res.json(memories);
   },
 );
 
+export const relevantMemoriesHandler = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const result = await findRelevantMemories(
+      req.userId!,
+      req.validatedQuery as RelevantMemoriesInput,
+    );
+    res.json(result);
+  },
+);
+
 export const getMemory = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { id } = req.params as { id: string };
+  const { id } = req.validatedParams as { id: string };
   const memory = await getMemoryById(req.userId!, id);
   res.json(memory);
 });
 
 export const updateMemoryHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { id } = req.params as { id: string };
+    const { id } = req.validatedParams as { id: string };
     const memory = await updateMemory(
       req.userId!,
       id,
-      req.body as UpdateMemoryInput,
+      req.validatedBody as UpdateMemoryInput,
     );
     res.json(memory);
   },
@@ -66,7 +78,7 @@ export const updateMemoryHandler = asyncHandler(
 
 export const deleteMemoryHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { id } = req.params as { id: string };
+    const { id } = req.validatedParams as { id: string };
     const result = await deleteMemory(req.userId!, id);
     res.json(result);
   },

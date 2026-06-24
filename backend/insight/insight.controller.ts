@@ -16,7 +16,7 @@ export const getInsights = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const insights = await listInsights(
       req.userId!,
-      req.query as unknown as ListInsightsInput,
+      req.validatedQuery as ListInsightsInput,
     );
     res.json(insights);
   },
@@ -24,7 +24,7 @@ export const getInsights = asyncHandler(
 
 export const getInsight = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { id } = req.params as { id: string };
+    const { id } = req.validatedParams as { id: string };
     const insight = await getInsightById(req.userId!, id);
     res.json(insight);
   },
@@ -32,7 +32,7 @@ export const getInsight = asyncHandler(
 
 export const deleteInsightHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { id } = req.params as { id: string };
+    const { id } = req.validatedParams as { id: string };
     const result = await deleteInsight(req.userId!, id);
     res.json(result);
   },
@@ -42,7 +42,7 @@ export const generateInsightsHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const insight = await generateInsights(
       req.userId!,
-      req.body as GenerateInsightsInput,
+      req.validatedBody as GenerateInsightsInput,
     );
     res.status(201).json(insight);
   },

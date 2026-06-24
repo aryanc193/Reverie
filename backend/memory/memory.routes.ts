@@ -5,6 +5,7 @@ import {
   createMemoryHandler,
   getMemories,
   searchMemoriesHandler,
+  relevantMemoriesHandler,
   getMemory,
   updateMemoryHandler,
   deleteMemoryHandler,
@@ -14,6 +15,7 @@ import {
   updateMemorySchema,
   listMemoriesSchema,
   searchMemoriesSchema,
+  relevantMemoriesSchema,
   memoryIdSchema,
 } from "../validators/memory.validator";
 
@@ -30,6 +32,12 @@ router.get(
   requireAuth,
   validate(searchMemoriesSchema, "query"),
   searchMemoriesHandler,
+);
+router.get(
+  "/relevant",
+  requireAuth,
+  validate(relevantMemoriesSchema, "query"),
+  relevantMemoriesHandler,
 );
 router.get(
   "/",
