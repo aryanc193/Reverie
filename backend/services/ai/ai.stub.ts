@@ -1,6 +1,8 @@
 import { createHash } from "crypto";
 import {
   AiService,
+  ChatReplyInput,
+  ChatReplyResult,
   InsightGenerationInput,
   InsightGenerationResult,
   MemoryAnalysisInput,
@@ -103,6 +105,27 @@ export class StubAiService implements AiService {
     return {
       title: `Weekly insight (${seed})`,
       content: `Over the last ${input.lookbackDays} days, you wrote ${input.memories.length} entries. Recurring themes: ${themeText}. Emotional tone: ${emotionText}.${moods.length > 0 ? ` Moods logged: ${moods.join(", ")}.` : ""}`,
+    };
+  }
+
+  async generateChatReply(input: ChatReplyInput): Promise<ChatReplyResult> {
+    const seed = createHash("sha256")
+      .update(input.userMessage)
+      .digest("hex")
+      .slice(0, 8);
+
+    const memoryNote =
+      input.recentMemories.length > 0
+        ? ` I noticed themes in your recent entries (${input.recentMemories
+            .slice(0, 3)
+            .map((memory) => memory.title || "untitled entry")
+            .join(", ")}).`
+        : " I don't have much journal context yet, but I'm here to reflect with you.";
+
+    const promptEcho = input.userMessage.slice(0, 120);
+
+    return {
+      content: `Stub companion (${seed}): thanks for sharing "${promptEcho}".${memoryNote} What feels most important about that right now?`,
     };
   }
 }

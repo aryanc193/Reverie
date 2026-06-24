@@ -83,3 +83,12 @@ export type CreateMemoryInput = z.infer<typeof createMemorySchema>;
 export type UpdateMemoryInput = z.infer<typeof updateMemorySchema>;
 export type ListMemoriesInput = z.infer<typeof listMemoriesSchema>;
 export type SearchMemoriesInput = z.infer<typeof searchMemoriesSchema>;
+
+export const relevantMemoriesSchema = z.object({
+  query: z.string().trim().min(1, "Query is required"),
+  tags: z.preprocess(parseCommaSeparatedTags, tagsSchema),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+
+export type RelevantMemoriesInput = z.infer<typeof relevantMemoriesSchema>;

@@ -33,10 +33,30 @@ export interface InsightGenerationResult {
   content: string;
 }
 
+export interface ChatMemoryContext {
+  id: string;
+  title?: string;
+  richTextContent: string;
+  mood?: string;
+  tags: string[];
+  createdAt: Date;
+}
+
+export interface ChatReplyInput {
+  userMessage: string;
+  recentMemories: ChatMemoryContext[];
+  conversationTitle?: string;
+}
+
+export interface ChatReplyResult {
+  content: string;
+}
+
 export interface AiService {
   analyzeEntry(input: MemoryAnalysisInput): Promise<ReflectionAnalysis>;
   embed(text: string): Promise<string>;
   generateInsight(
     input: InsightGenerationInput,
   ): Promise<InsightGenerationResult>;
+  generateChatReply(input: ChatReplyInput): Promise<ChatReplyResult>;
 }
