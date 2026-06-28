@@ -7,6 +7,7 @@ import ChatCard from "@/components/dashboard/ChatCard";
 import ChatThread from "@/components/dashboard/ChatThread";
 import JournalCard from "@/components/dashboard/JournalCard";
 import JournalFullscreen from "@/components/journal/JournalFullscreen";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function DashboardPage() {
   const { user, isLoading, isAuthenticated } = useRequireAuth();
@@ -34,7 +35,8 @@ export default function DashboardPage() {
     handleContentChange,
   } = useJournal();
 
-  if (isLoading || !isAuthenticated || !user) return null;
+  if (isLoading) return <LoadingScreen label="Loading your space" />;
+  if (!isAuthenticated || !user) return null;
 
   async function handleSend() {
     const content = chatQuery;
