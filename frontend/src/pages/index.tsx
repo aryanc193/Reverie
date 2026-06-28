@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useChat } from "@/hooks/useChat";
+import { useJournal } from "@/hooks/useJournal";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import ChatCard from "@/components/dashboard/ChatCard";
 import ChatThread from "@/components/dashboard/ChatThread";
 import JournalCard from "@/components/dashboard/JournalCard";
+import JournalFullscreen from "@/components/journal/JournalFullscreen";
 
 export default function DashboardPage() {
   const { user, isLoading, isAuthenticated } = useRequireAuth();
-  const [entryTitle, setEntryTitle] = useState("Untitled entry");
-  const [entryBody, setEntryBody] = useState("");
   const [chatQuery, setChatQuery] = useState("");
 
   const {
@@ -21,6 +21,18 @@ export default function DashboardPage() {
     closeThread,
     clearError,
   } = useChat();
+
+  const {
+    isFullscreen,
+    title,
+    htmlContent,
+    previewText,
+    saveStatus,
+    openFullscreen,
+    closeFullscreen,
+    handleTitleChange,
+    handleContentChange,
+  } = useJournal();
 
   if (isLoading || !isAuthenticated || !user) return null;
 
@@ -44,16 +56,25 @@ export default function DashboardPage() {
         error={chatError}
       />
       <JournalCard
-        title={entryTitle}
-        body={entryBody}
-        onTitleChange={setEntryTitle}
-        onBodyChange={setEntryBody}
+        title={title}
+        previewText={previewText}
+        onTitleChange={handleTitleChange}
+        onExpand={openFullscreen}
       />
       <ChatThread
         messages={messages}
         isOpen={isThreadOpen}
         isSending={isSending}
         onClose={closeThread}
+      />
+      <JournalFullscreen
+        isOpen={isFullscreen}
+        title={title}
+        htmlContent={htmlContent}
+        saveStatus={saveStatus}
+        onTitleChange={handleTitleChange}
+        onContentChange={handleContentChange}
+        onClose={closeFullscreen}
       />
     </DashboardShell>
   );
