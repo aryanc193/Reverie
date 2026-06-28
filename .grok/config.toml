@@ -1,0 +1,16 @@
+# Remote Figma MCP — OAuth; often fails in Cursor/embedded terminals (browser won't open)
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+enabled = false
+
+[mcp_servers.figma-dev]
+command = "npx"
+args = [
+    "-y",
+    "figma-developer-mcp",
+    "--stdio",
+]
+enabled = true
+
+[mcp_servers.figma-dev.env]
+FIGMA_API_KEY = "${FIGMA_API_KEY}"

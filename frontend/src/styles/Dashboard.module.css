@@ -1,0 +1,330 @@
+.shell {
+  min-height: 100vh;
+  padding: 20px;
+  background: var(--reverie-purple);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.frame {
+  position: relative;
+  width: min(1492px, 100%);
+  min-height: calc(100vh - 40px);
+  border-radius: var(--reverie-radius-shell);
+  background: var(--reverie-purple);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 24px 48px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0;
+}
+
+.sidebar img {
+  width: 100px;
+  height: auto;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  outline: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.main {
+  position: relative;
+  min-height: 100%;
+  border-radius: 0 var(--reverie-radius-shell) var(--reverie-radius-shell) 0;
+  background: var(--reverie-gradient);
+  overflow: hidden;
+}
+
+.bgLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pixelBg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  opacity: 0.95;
+  outline: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.cloud {
+  position: absolute;
+  width: min(360px, 40%);
+  height: auto;
+  opacity: 0.9;
+  outline: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.cloudTop {
+  right: 18%;
+  top: 10%;
+}
+
+.cloudMid {
+  right: 8%;
+  top: 32%;
+}
+
+.cloudBottom {
+  right: 22%;
+  bottom: 28%;
+}
+
+.logo {
+  position: absolute;
+  top: 23px;
+  right: 31px;
+  z-index: 2;
+  margin: 0;
+  color: var(--reverie-cream);
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 400;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 80px 40px 120px;
+  gap: 50px;
+}
+
+.chatPanel,
+.notePanel {
+  width: min(800px, 100%);
+}
+
+.chatPanel {
+  background: var(--reverie-panel);
+  border: 2px solid var(--reverie-purple);
+  border-radius: var(--reverie-radius-panel);
+  min-height: 200px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(95, 82, 132, 0.08);
+  transition: box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.chatPanel:focus-within {
+  box-shadow: 0 4px 16px rgba(95, 82, 132, 0.14);
+}
+
+.modelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modelLabel {
+  color: var(--reverie-purple);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  width: 24px;
+  height: 24px;
+  color: var(--reverie-purple);
+  flex-shrink: 0;
+}
+
+.chatInput {
+  border: none;
+  background: transparent;
+  color: var(--reverie-purple);
+  font-size: 1.5rem;
+  width: 100%;
+  outline: none;
+}
+
+.chatInput::placeholder {
+  color: var(--reverie-purple);
+  opacity: 0.85;
+}
+
+.notePanel {
+  position: relative;
+  background: var(--reverie-panel);
+  border: 2px solid var(--reverie-purple);
+  border-bottom: none;
+  border-radius: var(--reverie-radius-note) var(--reverie-radius-note) 0 0;
+  min-height: 400px;
+  padding: 60px 90px 40px;
+  box-shadow: 0 -2px 8px rgba(95, 82, 132, 0.06);
+}
+
+.noteDot {
+  position: absolute;
+  top: 37px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #000;
+}
+
+.noteDotLeft {
+  left: 37px;
+}
+
+.noteDotRight {
+  right: 37px;
+}
+
+.noteTitle {
+  margin: 0 0 16px;
+  color: var(--reverie-purple-80);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.noteBody {
+  width: 100%;
+  min-height: 180px;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  color: var(--reverie-purple-60);
+  font-size: 2rem;
+  line-height: 1.3;
+  outline: none;
+}
+
+.noteBody::placeholder {
+  color: var(--reverie-purple-60);
+}
+
+.userBadge {
+  position: absolute;
+  right: 25px;
+  bottom: 50px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 220px;
+  height: 80px;
+  padding: 7px 18px 7px 18px;
+  border-radius: 300px;
+  background: var(--reverie-purple);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.userBadge:active {
+  transform: scale(0.96);
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  object-fit: cover;
+  flex-shrink: 0;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.userText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.userName {
+  margin: 0;
+  color: var(--reverie-cream);
+  font-size: 2rem;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userPlan {
+  margin: 0;
+  color: var(--reverie-cream);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+  .frame {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .sidebar img {
+    width: 72px;
+  }
+
+  .content {
+    padding: 72px 20px 110px;
+    gap: 32px;
+  }
+
+  .notePanel {
+    padding: 48px 32px 32px;
+    border-radius: 40px 40px 0 0;
+  }
+
+  .noteTitle {
+    font-size: 2.25rem;
+  }
+
+  .noteBody,
+  .chatInput,
+  .modelLabel {
+    font-size: 1.25rem;
+  }
+
+  .userBadge {
+    right: 16px;
+    bottom: 20px;
+    width: min(220px, calc(100% - 32px));
+  }
+
+  .logo {
+    right: 16px;
+    top: 16px;
+    font-size: 1.75rem;
+  }
+}
+
+.noteTitle {
+  border: none;
+  background: transparent;
+  width: 100%;
+  padding: 0;
+}
